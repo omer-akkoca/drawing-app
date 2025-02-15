@@ -1,9 +1,19 @@
+import 'package:drawing/models/offset_custom.dart';
+import 'package:drawing/models/stroke.dart';
 import 'package:drawing/screens/drawing_screen.dart';
 import 'package:drawing/screens/home_screen.dart';
 import 'package:drawing/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+
+  Hive.registerAdapter(OffsetCustomAdapter());
+  Hive.registerAdapter(StrokeAdapter());
+
+  await Hive.openBox<List<Stroke>>("drawings");
   runApp(const MyApp());
 }
 

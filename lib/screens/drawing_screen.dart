@@ -1,5 +1,6 @@
 import 'package:drawing/models/stroke.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 class DrawingScreen extends StatefulWidget {
   const DrawingScreen({super.key});
@@ -14,6 +15,31 @@ class _DrawingScreenState extends State<DrawingScreen> {
   List<Offset> _currentPoints = [];
   Color _selectedColor = Colors.black;
   double _brushSize = 4.0;
+  late Box<List<Stroke>> _drawingBox;
+
+  @override
+  void initState() {
+    _initializeHive();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    Hive.close();
+    super.dispose();
+  }
+
+  Future<void> _initializeHive() async{
+    _drawingBox = Hive.box<List<Stroke>>("drawings");
+  }
+
+  Future<void> _saveDrawings() async{
+
+  }
+
+  void _showSaveDialog(){
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,6 +150,7 @@ class _DrawingScreenState extends State<DrawingScreen> {
       ),
     );
   }
+
   Widget _buildColorButton(Color color){
     return GestureDetector(
       onTap: (){
@@ -166,12 +193,13 @@ class DrawPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     for(var stroke in strokes){
       final paint = Paint()
-          ..color = stroke.color
-          ..strokeCap = StrokeCap.round
+          ..color = stroke.strokeColor
+        ..strokeCap = StrokeCap.round
           ..strokeWidth = stroke.brushSize;
+      final points = stroke.offsetPoints;
       for(int i=0; i< stroke.points.length - 1; i++){
-        if (stroke.points[i] != Offset.zero && stroke.points[i+1] != Offset.zero) {
-          canvas.drawLine(stroke.points[i], stroke.points[i+1], paint);
+        if (points[i] != Offset.zero && points[i+1] != Offset.zero) {
+          canvas.drawLine(points[i], points[i+1], paint);
         }  
       }
     }
